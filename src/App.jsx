@@ -20,7 +20,7 @@ function App() {
   return (
     <div className="canvas-container">
       {/* Overlay de carga */}
-      <LoadingOverlay loadingProgress={loadingProgress} currentResolution={currentResolution} />
+      {/* <LoadingOverlay loadingProgress={loadingProgress} currentResolution={currentResolution} /> */}
 
       {/* Botones de UI */}
       <div style={{

@@ -12,13 +12,32 @@ function LogCubes() {
 
       scene.traverse((object) => {
         if (object instanceof THREE.Mesh && object.geometry instanceof THREE.PlaneGeometry) {
+          const material = object.material;
+          const maps = {};
+
+          // Get base color map
+          if (material.map) {
+            maps.baseColor = material.map.source.data.src || 'No base color map';
+          }
+
+          // Get normal map
+          if (material.normalMap) {
+            maps.normalMap = material.normalMap.source.data.src || 'No normal map';
+          }
+
+          // Get roughness map
+          if (material.roughnessMap) {
+            maps.roughnessMap = material.roughnessMap.source.data.src || 'No roughness map';
+          }
+
           // Agregar información del cubo al objeto
           cubesInfo[object.uuid] = {
             name: object.name || 'Sin nombre', // Incluir el nombre del cubo
             position: object.position.toArray(),
             rotation: object.rotation.toArray(),
-            material: object.material ? object.material.type : 'No material',
+            material: material ? material.type : 'No material',
             geometry: object.geometry.type,
+            maps: material
           };
         }
       });
