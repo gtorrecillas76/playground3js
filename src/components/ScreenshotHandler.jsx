@@ -2,58 +2,99 @@ import React, { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-function ScreenshotHandler({ onScreenshot }) {
+function ScreenshotHandler({ onScreenshot, controlsRef }) {
   const { gl, scene, camera } = useThree();
 
   useEffect(() => {
-    const takeScreenshot = (angle) => {
-      // Crear una cámara virtual para las capturas
-      const virtualCamera = new THREE.PerspectiveCamera(
-        camera.fov,
-        camera.aspect,
-        camera.near,
-        camera.far
-      );
-
-      // Configurar la cámara virtual con posiciones absolutas
-      switch (angle) {
-        case 'front':
-          virtualCamera.position.set(0, 0, 8);
-          virtualCamera.up.set(0, 1, 0);
-          break;
-        case 'side':
-          virtualCamera.position.set(8, 0, 0);
-          virtualCamera.up.set(0, 1, 0);
-          break;
-        case 'top':
-          virtualCamera.position.set(0, 8, 0);
-          virtualCamera.up.set(0, 0, -1);
-          break;
-        case 'isometric':
-          virtualCamera.position.set(8, 8, 8);
-          virtualCamera.up.set(0, 1, 0);
-          break;
+    const takeScreenshot = async (angle) => {
+      if (!controlsRef.current) {
+        console.error('No controlsRef.current available');
+        return;
       }
-      virtualCamera.lookAt(0, 0, 0);
+
+      // Store current camera state
+      const currentCamera = camera;
+      const oldPosition = currentCamera.position.clone();
+      const oldRotation = currentCamera.rotation.clone();
+      const oldUp = currentCamera.up.clone();
+      const oldTarget = controlsRef.current.target.clone();
+
+      // Create virtual camera with same properties as current camera
+      const virtualCamera = currentCamera.clone();
+
+      if (angle === 'current') {
+        // Use current camera position and orientation
+        virtualCamera.position.copy(currentCamera.position);
+        virtualCamera.rotation.copy(currentCamera.rotation);
+        virtualCamera.up.copy(currentCamera.up);
+      } else {
+        // Set camera positions based on angle
+        switch (angle) {
+          case 'front':
+            virtualCamera.position.set(0, 0, 8);
+            virtualCamera.up.set(0, 1, 0);
+            controlsRef.current.target.set(0, 0, 0);
+            break;
+          case 'side':
+            virtualCamera.position.set(8, 0, 0);
+            virtualCamera.up.set(0, 1, 0);
+            controlsRef.current.target.set(0, 0, 0);
+            break;
+          case 'top':
+            virtualCamera.position.set(0, 8, 0);
+            virtualCamera.up.set(0, 0, -1);
+            controlsRef.current.target.set(0, 0, 0);
+            break;
+          case 'isometric':
+            virtualCamera.position.set(8, 8, 8);
+            virtualCamera.up.set(0, 1, 0);
+            controlsRef.current.target.set(0, 0, 0);
+            break;
+        }
+        virtualCamera.lookAt(0, 0, 0);
+      }
+
       virtualCamera.updateProjectionMatrix();
       virtualCamera.updateMatrixWorld();
 
-      // Render y captura
+      // Take screenshot
       gl.render(scene, virtualCamera);
+      
+      try {
+        const blob = await new Promise(resolve => {
+          gl.domElement.toBlob(resolve, 'image/png', 1.0);
+        });
 
-      return new Promise((resolve) => {
-        gl.domElement.toBlob((blob) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(blob);
-        }, 'image/webp', 1.0);
-      });
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `screenshot-${angle}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        // Restore original camera state
+        currentCamera.position.copy(oldPosition);
+        currentCamera.rotation.copy(oldRotation);
+        currentCamera.up.copy(oldUp);
+        controlsRef.current.target.copy(oldTarget);
+        currentCamera.updateProjectionMatrix();
+        controlsRef.current.update();
+
+        console.log('Screenshot saved');
+        return url;
+      } catch (error) {
+        console.error('Screenshot failed:', error);
+        return null;
+      }
     };
 
     if (onScreenshot) {
       onScreenshot(takeScreenshot);
     }
-  }, [gl, scene, camera, onScreenshot]);
+  }, [gl, scene, camera, controlsRef, onScreenshot]);
 
   return null;
 }
