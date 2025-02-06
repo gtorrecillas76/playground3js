@@ -13,7 +13,7 @@ import TextureSlider from './components/TextureSlider';
 
 
 function App() {
-  const { position, isOrthographic, toggleProjection, resetPosition } = useCameraStore();
+  const { position, rotation, target, isOrthographic, toggleProjection, resetPosition } = useCameraStore();
   const screenshotRef = useRef(null);
   const controlsRef = useRef();
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -50,11 +50,28 @@ function App() {
         {/* Componentes de la escena */}
         <ScreenshotHandler onScreenshot={(handler) => (screenshotRef.current = handler)} />
         <CameraControls controlsRef={controlsRef} />
+        
+        {/* Simplified camera setup */}
         {isOrthographic ? (
-          <OrthographicCamera makeDefault position={position} zoom={50} />
+          <OrthographicCamera 
+            makeDefault 
+            position={position}
+            rotation={rotation}
+            zoom={50}
+            near={-1000}
+            far={1000}
+          />
         ) : (
-          <PerspectiveCamera makeDefault position={position} />
+          <PerspectiveCamera 
+            makeDefault 
+            position={position}
+            rotation={rotation}
+            fov={75}
+            near={0.1}
+            far={1000}
+          />
         )}
+        
         <Lighting />
         <GridHelper />
         <CubeGrid setLoadingProgress={setLoadingProgress} setCurrentResolution={setCurrentResolution} />
