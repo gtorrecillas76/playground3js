@@ -137,32 +137,10 @@ function TexturedCube({ name, position, setLoadingProgress, setCurrentResolution
   }, [textureOffset]);
 
   return (
-    <group position={position} name={name}>
-      {/* Cara frontal */}
-      <mesh material={materialsRef.current[0]}>
-        <planeGeometry args={[1, 1]} />
-      </mesh>
-      {/* Cara trasera */}
-      <mesh position={[0, 0, -1]} material={materialsRef.current[1]}>
-        <planeGeometry args={[1, 1]} />
-      </mesh>
-      {/* Cara superior */}
-      <mesh position={[0, 0.5, -0.5]} rotation={[Math.PI / 2, 0, 0]} material={materialsRef.current[2]}>
-        <planeGeometry args={[1, 1]} />
-      </mesh>
-      {/* Cara inferior */}
-      <mesh position={[0, -0.5, -0.5]} rotation={[Math.PI / 2, 0, 0]} material={materialsRef.current[3]}>
-        <planeGeometry args={[1, 1]} />
-      </mesh>
-      {/* Cara derecha */}
-      <mesh position={[0.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} material={materialsRef.current[4]}>
-        <planeGeometry args={[1, 1]} />
-      </mesh>
-      {/* Cara izquierda */}
-      <mesh position={[-0.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} material={materialsRef.current[5]}>
-        <planeGeometry args={[1, 1]} />
-      </mesh>
-    </group>
+    <mesh position={position} name={name} material={materialsRef.current}>
+      {/* Using a real cube with box geometry */}
+      <boxGeometry args={[1, 1, 1]} />
+    </mesh>
   );
 }
 
