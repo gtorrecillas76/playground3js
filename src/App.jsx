@@ -9,6 +9,8 @@ import CubeGrid from './components/CubeGrid';
 import ScreenshotHandler from './components/ScreenshotHandler';
 import LoadingOverlay from './components/LoadingOverlay';
 import LogCubes from './components/LogCubes';
+import TextureSlider from './components/TextureSlider';
+
 
 function App() {
   const { position, isOrthographic, toggleProjection, resetPosition } = useCameraStore();
@@ -41,6 +43,8 @@ function App() {
         <button onClick={() => screenshotRef.current('isometric')}>Captura Isométrica</button>
       </div>
 
+      <TextureSlider />
+
       {/* Canvas principal */}
       <Canvas style={{ width: '100vw', height: '100vh', background: '#000' }}>
         {/* Componentes de la escena */}
@@ -54,7 +58,9 @@ function App() {
         <Lighting />
         <GridHelper />
         <CubeGrid setLoadingProgress={setLoadingProgress} setCurrentResolution={setCurrentResolution} />
-        <LogCubes />
+        {/* <LogCubes /> */}
+
+
       </Canvas>
     </div>
   );
