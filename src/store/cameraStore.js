@@ -15,7 +15,7 @@ export const useCameraStore = create((set, get) => ({
   // Keep current position when toggling projection
   toggleProjection: () => {
     const currentState = get();
-    console.log('Toggle projection - Current state:', currentState); // Debug log
+    // console.log('Toggle projection - Current state:', currentState); // Debug log
     
     set(state => ({
       isOrthographic: !state.isOrthographic,
@@ -24,7 +24,7 @@ export const useCameraStore = create((set, get) => ({
       target: currentState.target
     }));
     
-    console.log('After toggle:', get()); // Debug log
+    // console.log('After toggle:', get()); // Debug log
   },
   
   resetPosition: () => 

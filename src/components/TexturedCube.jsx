@@ -1,12 +1,17 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useTexture } from '@react-three/drei';
 import { useTextureStore } from '../store/textureStore';
+import { useGLTF } from '@react-three/drei';
 
 function TexturedCube({ name, position, setLoadingProgress, setCurrentResolution, texture }) {
   const [currentMipmapLevel, setCurrentMipmapLevel] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const  model = useGLTF('./model.glb');
+  const  gltfModel = model.scene;
+  console.log( model);
   const textureRef = useRef(null);
   const materialsRef = useRef([]);
   
@@ -137,10 +142,15 @@ function TexturedCube({ name, position, setLoadingProgress, setCurrentResolution
   }, [textureOffset]);
 
   return (
-    <mesh position={position} name={name} material={materialsRef.current}>
-      {/* Using a real cube with box geometry */}
-      <boxGeometry args={[1, 1, 1]} />
-    </mesh>
+    <group position={position} name={name}>
+      {gltfModel ? (
+        <primitive object={gltfModel} />
+      ) : (
+        <mesh material={materialsRef.current}>
+          <boxGeometry args={[1, 1, 1]} />
+        </mesh>
+      )}
+    </group>
   );
 }
 
